@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.jetbrainsKotlinAndroid)
@@ -8,11 +11,30 @@ android {
     namespace = "com.manudev.data"
     compileSdk = 34
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
         minSdk = 28
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+
+        val localProperties: Properties =
+            Properties().apply {
+                load(FileInputStream(File(rootProject.rootDir, "local.properties")))
+            }
+        buildConfigField(
+            type = "String",
+            name = "MARVEL_PRIVATE_KEY",
+            value = localProperties.getProperty("MARVEL_PRIVATE_KEY") ?: "",
+        )
+        buildConfigField(
+            type = "String",
+            name = "MARVEL_PUBLIC_KEY",
+            value = localProperties.getProperty("MARVEL_PUBLIC_KEY") ?: "",
+        )
     }
 
     buildTypes {
