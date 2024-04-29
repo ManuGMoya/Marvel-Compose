@@ -1,6 +1,6 @@
-package com.manudev.data.network
+package com.manudev.data.character.remote
 
-import com.manudev.data.model.CharacterDataContainer
+import com.manudev.data.character.remote.model.CharacterDataContainer
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query

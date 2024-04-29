@@ -1,6 +1,6 @@
 package com.manudev.data.di
 
-import com.manudev.data.network.CharacterApi
+import com.manudev.data.character.remote.CharacterApi
 import com.manudev.data.network.Interceptor
 import dagger.Module
 import dagger.Provides

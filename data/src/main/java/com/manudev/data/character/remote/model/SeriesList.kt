@@ -1,4 +1,4 @@
-package com.manudev.data.model
+package com.manudev.data.character.remote.model
 
 data class SeriesList(
     val available: Int?,
