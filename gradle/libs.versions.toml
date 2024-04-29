@@ -12,6 +12,7 @@ appcompat = "1.6.1"
 material = "1.11.0"
 hilt = "2.49"
 hiltNav = "1.2.0"
+retrofit = "2.9.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -34,6 +35,10 @@ material = { group = "com.google.android.material", name = "material", version.r
 hilt = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hiltCompiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
 hiltNavigation = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNav" }
+
+retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+retrofitGson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
+
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

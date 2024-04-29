@@ -44,4 +44,7 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 
     implementation(libs.hilt)
+
+    implementation(libs.retrofit)
+    implementation(libs.retrofitGson)
 }
