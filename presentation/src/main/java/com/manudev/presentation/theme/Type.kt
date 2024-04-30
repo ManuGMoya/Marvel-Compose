@@ -1,4 +1,4 @@
-package com.manudev.presentation.screens.theme
+package com.manudev.presentation.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

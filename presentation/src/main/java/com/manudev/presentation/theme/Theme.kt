@@ -1,4 +1,4 @@
-package com.manudev.presentation.screens.theme
+package com.manudev.presentation.theme
 
 import android.app.Activity
 import android.os.Build

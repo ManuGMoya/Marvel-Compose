@@ -1,4 +1,4 @@
-package com.manudev.presentation.screens.theme
+package com.manudev.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 
