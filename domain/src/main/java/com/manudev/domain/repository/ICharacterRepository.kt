@@ -3,7 +3,7 @@ package com.manudev.domain.repository
 import com.manudev.domain.model.CharacterDomain
 import kotlinx.coroutines.flow.Flow
 
-interface CharacterRepository {
+interface ICharacterRepository {
 
     fun getCharacters(
         offset: Int,

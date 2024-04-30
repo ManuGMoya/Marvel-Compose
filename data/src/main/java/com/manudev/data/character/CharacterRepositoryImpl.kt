@@ -2,14 +2,14 @@ package com.manudev.data.character
 
 import com.manudev.data.character.remote.CharacterRemoteDataSource
 import com.manudev.domain.model.CharacterDomain
-import com.manudev.domain.repository.CharacterRepository
+import com.manudev.domain.repository.ICharacterRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class CharacterRepositoryImpl @Inject constructor(
     private val remote: CharacterRemoteDataSource
-) : CharacterRepository {
+) : ICharacterRepository {
 
     override fun getCharacters(offset: Int, limit: Int): Flow<List<CharacterDomain>> =
         flow {
