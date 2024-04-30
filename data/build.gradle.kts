@@ -66,7 +66,9 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 
     implementation(libs.hilt)
+    kapt(libs.hiltCompiler)
 
     implementation(libs.retrofit)
     implementation(libs.retrofitGson)
+    implementation(libs.loggingInterceptor)
 }
