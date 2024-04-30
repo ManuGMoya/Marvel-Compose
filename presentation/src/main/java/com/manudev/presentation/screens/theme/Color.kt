@@ -1,4 +1,4 @@
-package com.manudev.mangotest.ui.theme
+package com.manudev.presentation.screens.theme
 
 import androidx.compose.ui.graphics.Color
 
