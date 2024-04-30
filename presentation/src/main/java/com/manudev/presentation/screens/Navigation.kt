@@ -5,7 +5,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.manudev.presentation.screens.detail.Detail
-import com.manudev.presentation.screens.home.Home
+import com.manudev.presentation.screens.home.HomeScreen
 
 sealed class Screen(val route: String) {
     data object Home : Screen(route = "home")
@@ -19,7 +19,11 @@ fun Navigation() {
     Screen {
         NavHost(navController = navController, startDestination = "home") {
             composable(Screen.Home.route) {
-                Home()
+                HomeScreen(
+                    onItemClick = {
+
+                    }
+                )
             }
             composable(Screen.Detail.route) {
                 Detail()
