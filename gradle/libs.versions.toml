@@ -14,6 +14,7 @@ hilt = "2.49"
 hiltNav = "1.2.0"
 retrofit = "2.9.0"
 interceptor = "4.12.0"
+coilVersion = "2.5.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -40,6 +41,8 @@ hiltNavigation = { group = "androidx.hilt", name = "hilt-navigation-compose", ve
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 retrofitGson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
 loggingInterceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "interceptor" }
+coil = { group = "io.coil-kt", name = "coil-compose", version.ref = "coilVersion" }
+
 
 
 [plugins]
