@@ -14,9 +14,10 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val characterUseCase: CharacterUseCase
-): ViewModel() {
+) : ViewModel() {
 
     var state by mutableStateOf(UiState(isLoading = true))
+
     data class UiState(
         val isLoading: Boolean = false,
         val characters: List<CharacterDomain> = emptyList(),
@@ -26,12 +27,16 @@ class HomeViewModel @Inject constructor(
 
     fun getCharacters(offset: Int, limit: Int) {
         viewModelScope.launch {
+            state = state.copy(isLoading = true)
             try {
-                characterUseCase.getCharacters(offset, limit).collect { characters ->
-                    state = UiState(isLoading = false, characters = characters)
+                characterUseCase.getCharacters(offset, limit).collect { newCharacters ->
+                    state = state.copy(
+                        isLoading = false,
+                        characters = state.characters + newCharacters
+                    )
                 }
             } catch (e: Exception) {
-                state = UiState(isLoading = false, error = e.message)
+                state = state.copy(isLoading = false, error = e.message)
             }
         }
     }
