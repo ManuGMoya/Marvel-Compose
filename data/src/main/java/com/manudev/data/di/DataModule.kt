@@ -1,6 +1,7 @@
 package com.manudev.data.di
 
 import com.manudev.data.character.remote.CharacterApi
+import com.manudev.data.comic.remote.ComicApi
 import com.manudev.data.network.Interceptor
 import dagger.Module
 import dagger.Provides
@@ -42,6 +43,9 @@ class DataModule {
     }
 
     @Provides
-    fun provideCharacterMarvelApi(retrofit: Retrofit): CharacterApi = retrofit.create()
+    fun provideCharacterApi(retrofit: Retrofit): CharacterApi = retrofit.create()
+
+    @Provides
+    fun provideComicApi(retrofit: Retrofit): ComicApi = retrofit.create()
 
 }
