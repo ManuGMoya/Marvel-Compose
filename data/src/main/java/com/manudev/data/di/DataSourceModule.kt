@@ -2,8 +2,8 @@ package com.manudev.data.di
 
 
 import com.manudev.data.character.CharacterRepositoryImpl
-import com.manudev.data.character.remote.CharacterRemoteDataSource
-import com.manudev.data.character.remote.CharacterRemoteDataSourceImpl
+import com.manudev.data.character.remote.datasource.CharacterRemoteDataSource
+import com.manudev.data.character.remote.datasource.CharacterRemoteDataSourceImpl
 import com.manudev.domain.repository.ICharacterRepository
 import dagger.Binds
 import dagger.Module

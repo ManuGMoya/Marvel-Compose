@@ -16,7 +16,9 @@ class CharacterRepositoryImpl @Inject constructor(
         flow {
             when (val response = remote.getAllCharacter(offset, limit)) {
                 is APIResponseStatus.Success -> {
-                    emit(response.data.data?.results?.map { it.toDomain() } ?: emptyList())
+                    emit(response.data.data?.results?.map {
+                        it.toDomain()
+                    } ?: emptyList())
                 }
 
                 is APIResponseStatus.Error -> {
@@ -52,7 +54,9 @@ class CharacterRepositoryImpl @Inject constructor(
                 nameStartsWith = nameStartsWith
             )) {
                 is APIResponseStatus.Success -> {
-                    emit(response.data.data?.results?.map { it.toDomain() } ?: emptyList())
+                    emit(response.data.data?.results?.map {
+                        it.toDomain()
+                    } ?: emptyList())
                 }
 
                 is APIResponseStatus.Error -> {

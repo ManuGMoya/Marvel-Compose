@@ -4,7 +4,7 @@ import com.manudev.domain.model.CharacterDomain
 import com.manudev.domain.model.Comic
 import java.util.Date
 
-data class Character(
+data class CharacterDto(
     val id: Int,
     val name: String?,
     val description: String?,
