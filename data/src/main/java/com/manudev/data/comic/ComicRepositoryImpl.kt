@@ -1,4 +1,4 @@
-package com.manudev.data.comic.remote
+package com.manudev.data.comic
 
 import com.manudev.data.comic.remote.datasource.ComicRemoteDataSource
 import com.manudev.data.response.APIResponseStatus

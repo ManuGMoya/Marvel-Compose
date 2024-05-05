@@ -16,7 +16,7 @@ interface DomainModule {
 
     @Binds
     fun bindCharacterUseCase(characterUseCaseImpl: CharacterUseCaseImpl): CharacterUseCase
-    
+
     @Binds
     fun bindComicUseCase(comicUseCaseImpl: ComicUseCaseImpl): ComicUseCase
 }

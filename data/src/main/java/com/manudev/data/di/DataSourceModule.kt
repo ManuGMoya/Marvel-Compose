@@ -4,7 +4,7 @@ package com.manudev.data.di
 import com.manudev.data.character.CharacterRepositoryImpl
 import com.manudev.data.character.remote.datasource.CharacterRemoteDataSource
 import com.manudev.data.character.remote.datasource.CharacterRemoteDataSourceImpl
-import com.manudev.data.comic.remote.ComicRepositoryImpl
+import com.manudev.data.comic.ComicRepositoryImpl
 import com.manudev.data.comic.remote.datasource.ComicRemoteDataSource
 import com.manudev.data.comic.remote.datasource.ComicRemoteDataSourceImpl
 import com.manudev.domain.repository.ICharacterRepository
@@ -22,7 +22,7 @@ interface DataSourceModule {
     @Singleton
     @Binds
     fun bindsCharacterRepository(characterRepositoryImpl: CharacterRepositoryImpl): ICharacterRepository
-    
+
     @Binds
     fun bindsCharacterRemoteDatasource(characterRemoteDataSourceImpl: CharacterRemoteDataSourceImpl): CharacterRemoteDataSource
 
