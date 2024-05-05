@@ -2,4 +2,7 @@
 <resources>
     <string name="AppName">Marvel Characters</string>
     <string name="Search">Search</string>
+    <string name="Close">Close</string>
+    <string name="Detail">Detail</string>
+    <string name="Back">Back</string>
 </resources>

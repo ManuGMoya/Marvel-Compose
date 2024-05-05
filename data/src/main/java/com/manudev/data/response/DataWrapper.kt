@@ -1,6 +1,8 @@
-package com.manudev.data.character.remote.model
+package com.manudev.data.response
 
-data class CharacterDataWrapper(
+import com.manudev.data.character.remote.model.CharacterDataContainer
+
+data class DataWrapper(
     val code: Int?,
     val status: String?,
     val copyright: String?,

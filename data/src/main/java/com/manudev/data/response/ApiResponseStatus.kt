@@ -1,4 +1,4 @@
-package com.manudev.data.character.remote
+package com.manudev.data.response
 
 /**
  * A sealed class representing the status of an API response.

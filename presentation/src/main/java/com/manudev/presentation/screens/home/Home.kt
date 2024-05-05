@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
@@ -64,10 +65,18 @@ fun HomeScreen(
                     IconButton(onClick = {
                         isSearchMode = !isSearchMode
                     }) {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = stringResource(R.string.Search)
-                        )
+                        if (isSearchMode) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = stringResource(R.string.Close)
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = stringResource(R.string.Search)
+                            )
+                        }
+
                     }
                 }
             )
@@ -150,7 +159,7 @@ fun CharacterItem(
         },
         supportingContent = {
             Text(
-                text = character.numberOfComics.toString()
+                text = character.comics.size.toString(),
             )
         },
         modifier = Modifier

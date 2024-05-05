@@ -1,6 +1,8 @@
-package com.manudev.data.character.remote
+package com.manudev.data.character.remote.datasource
 
-import com.manudev.data.character.remote.model.CharacterDataWrapper
+import com.manudev.data.response.APIResponseStatus
+import com.manudev.data.character.remote.CharacterApi
+import com.manudev.data.response.DataWrapper
 import javax.inject.Inject
 
 class CharacterRemoteDataSourceImpl @Inject constructor(
@@ -9,7 +11,7 @@ class CharacterRemoteDataSourceImpl @Inject constructor(
     override suspend fun getAllCharacter(
         offset: Int,
         limit: Int
-    ): APIResponseStatus<CharacterDataWrapper> {
+    ): APIResponseStatus<DataWrapper> {
         return try {
             val response = service.getAllCharacters(offset, limit)
             if (response.isSuccessful) {
@@ -22,7 +24,7 @@ class CharacterRemoteDataSourceImpl @Inject constructor(
         }
     }
 
-    override suspend fun getCharacterById(characterId: Int): APIResponseStatus<CharacterDataWrapper> {
+    override suspend fun getCharacterById(characterId: Int): APIResponseStatus<DataWrapper> {
         return try {
             val response = service.getCharacterById(characterId)
             if (response.isSuccessful) {
@@ -39,7 +41,7 @@ class CharacterRemoteDataSourceImpl @Inject constructor(
         offset: Int,
         limit: Int,
         nameStartsWith: String
-    ): APIResponseStatus<CharacterDataWrapper> {
+    ): APIResponseStatus<DataWrapper> {
         return try {
             val response = service.getCharacterByStartName(
                 offset = offset,

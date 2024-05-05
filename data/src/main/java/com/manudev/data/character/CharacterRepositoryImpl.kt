@@ -1,7 +1,7 @@
 package com.manudev.data.character
 
-import com.manudev.data.character.remote.APIResponseStatus
-import com.manudev.data.character.remote.CharacterRemoteDataSource
+import com.manudev.data.response.APIResponseStatus
+import com.manudev.data.character.remote.datasource.CharacterRemoteDataSource
 import com.manudev.domain.model.CharacterDomain
 import com.manudev.domain.repository.ICharacterRepository
 import kotlinx.coroutines.flow.Flow

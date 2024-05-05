@@ -1,6 +1,7 @@
 package com.manudev.data.character.remote.model
 
 import com.manudev.domain.model.CharacterDomain
+import com.manudev.domain.model.Comic
 import java.util.Date
 
 data class Character(
@@ -22,7 +23,12 @@ data class Character(
             name = name,
             image = thumbnail?.path + "." + thumbnail?.extension,
             description = description,
-            numberOfComics = comics?.items?.count() ?: 0
+            comics = comics?.items?.map {
+                Comic(
+                    resourceURI = it.resourceURI,
+                    name = it.name
+                )
+            } ?: emptyList()
         )
     }
 }
