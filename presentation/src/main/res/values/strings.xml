@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="AppName">Marvel Characters</string>
+    <string name="Search">Search</string>
+    <string name="Close">Close</string>
+    <string name="Detail">Detail</string>
+    <string name="Back">Back</string>
+    <string name="NumberOfComics">Number of Comics:</string>
+    <string name="Retry">Retry</string>
+    <string name="logo">logo</string>
+    <string name="welcome_to_marvel_world">Welcome to Marvel World!</string>
+</resources>
