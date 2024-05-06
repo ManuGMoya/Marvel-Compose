@@ -55,6 +55,12 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
+    testImplementation(libs.mockk.android)
+    testImplementation(libs.mockk.agent)
+
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.kotlinx.coroutines.core)
+
     implementation(libs.hilt)
     kapt(libs.hiltCompiler)
     implementation(libs.hiltNavigation)

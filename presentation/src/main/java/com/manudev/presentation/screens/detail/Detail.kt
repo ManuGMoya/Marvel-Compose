@@ -158,20 +158,24 @@ fun ComicItem(comic: ComicDomain) {
         ),
     ) {
         Column(modifier = Modifier.padding(Padding16)) {
-            Text(
-                text = comic.title,
-                style = typography.titleMedium,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
+            comic.title?.let {
+                Text(
+                    text = it,
+                    style = typography.titleMedium,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
             Spacer(modifier = Modifier.height(Padding8))
-            Text(
-                text = comic.date,
-                style = typography.bodyMedium,
-                color = Color.Gray
-            )
+            comic.date?.let {
+                Text(
+                    text = it,
+                    style = typography.bodyMedium,
+                    color = Color.Gray
+                )
+            }
             Spacer(modifier = Modifier.height(Padding8))
-            AnimatedVisibility(visible = comic.image.isNotEmpty()) {
+            AnimatedVisibility(visible = comic.image?.isNotEmpty() == true) {
                 AsyncImage(
                     model = comic.image,
                     contentDescription = comic.title,
@@ -180,7 +184,6 @@ fun ComicItem(comic: ComicDomain) {
                         .fillMaxWidth()
                 )
             }
-
         }
     }
 }

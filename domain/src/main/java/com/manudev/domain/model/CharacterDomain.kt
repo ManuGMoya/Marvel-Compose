@@ -1,7 +1,7 @@
 package com.manudev.domain.model
 
 data class CharacterDomain(
-    val id: Int,
+    val id: Int?,
     val name: String?,
     val image: String?,
     val description: String?,
