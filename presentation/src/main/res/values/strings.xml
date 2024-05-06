@@ -7,4 +7,6 @@
     <string name="Back">Back</string>
     <string name="NumberOfComics">Number of Comics:</string>
     <string name="Retry">Retry</string>
+    <string name="logo">logo</string>
+    <string name="welcome_to_marvel_world">Welcome to Marvel World!</string>
 </resources>

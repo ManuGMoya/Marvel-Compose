@@ -10,6 +10,8 @@ import com.manudev.presentation.screens.detail.Detail
 import com.manudev.presentation.screens.home.HomeScreen
 
 sealed class Screen(val route: String) {
+
+    data object Splash : Screen(route = "splash")
     data object Home : Screen(route = "home")
     data object Detail : Screen(route = "detail/{id}") {
         fun createRoute(id: Int): String = "detail/$id"
@@ -21,7 +23,12 @@ fun Navigation() {
     val navController = rememberNavController()
 
     Screen {
-        NavHost(navController = navController, startDestination = Screen.Home.route) {
+        NavHost(navController = navController, startDestination = Screen.Splash.route) {
+
+            composable(Screen.Splash.route) {
+                SplashScreen(navController)
+            }
+
             composable(Screen.Home.route) {
                 HomeScreen(
                     onItemClick = {
