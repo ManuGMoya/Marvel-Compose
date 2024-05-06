@@ -3,7 +3,7 @@ package com.manudev.data.character.remote.model
 import com.manudev.domain.model.CharacterDomain
 
 data class CharacterDto(
-    val id: Int,
+    val id: Int?,
     val name: String?,
     val description: String?,
     val thumbnail: Image?,

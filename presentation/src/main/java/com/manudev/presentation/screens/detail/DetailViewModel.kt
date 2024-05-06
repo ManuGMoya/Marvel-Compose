@@ -37,7 +37,7 @@ class DetailViewModel @Inject constructor(
                         isLoading = false,
                         character = character
                     )
-                    getComics(character.id)
+                    character.id?.let { getComics(it) }
                 }
             } catch (e: Exception) {
                 state = state.copy(isLoading = false, error = e.message)

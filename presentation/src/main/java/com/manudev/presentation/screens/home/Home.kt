@@ -85,8 +85,10 @@ fun HomeScreen(
         }
     )
 
-    LaunchedEffect(viewModel.state.characters.isEmpty()) {
-        viewModel.getCharacters(INITIAL_PAGE, PAGE_SIZE)
+    LaunchedEffect(Unit) {
+        if (viewModel.state.characters.isEmpty()) {
+            viewModel.getCharacters(INITIAL_PAGE, PAGE_SIZE)
+        }
     }
 }
 
@@ -198,7 +200,7 @@ fun HomeContent(
                         if (index > INITIAL_PAGE) Divider()
                         CharacterItem(
                             character = character,
-                            onItemClick = { onItemClick(character.id) }
+                            onItemClick = { character.id?.let { onItemClick(it) } }
                         )
                         if (index == state.characters.size - 1) {
                             onRefreshList(index + 1, PAGE_SIZE)
