@@ -25,17 +25,14 @@ class HomeViewModel @Inject constructor(
     )
 
 
-    fun getCharacters(offset: Int, limit: Int, reset: Boolean = false) {
+    fun getCharacters(offset: Int, limit: Int) {
         viewModelScope.launch {
             state = state.copy(isLoading = true, error = null)
             try {
                 characterUseCase.getCharacters(offset, limit).collect { newCharacters ->
                     state = state.copy(
                         isLoading = false,
-                        characters = if (reset)
-                            newCharacters
-                        else
-                            (state.characters + newCharacters).distinctBy { it.id }
+                        characters = (state.characters + newCharacters).distinctBy { it.id }
                     )
                 }
             } catch (e: Exception) {

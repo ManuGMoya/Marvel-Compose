@@ -79,14 +79,14 @@ fun HomeScreen(
                 onItemClick = onItemClick,
                 onRefreshList = viewModel::getCharacters,
                 onRetry = {
-                    viewModel.getCharacters(INITIAL_PAGE, PAGE_SIZE, true)
+                    viewModel.getCharacters(INITIAL_PAGE, PAGE_SIZE)
                 }
             )
         }
     )
 
-    LaunchedEffect(Unit) {
-        viewModel.getCharacters(INITIAL_PAGE, PAGE_SIZE, true)
+    LaunchedEffect(viewModel.state.characters.isEmpty()) {
+        viewModel.getCharacters(INITIAL_PAGE, PAGE_SIZE)
     }
 }
 
@@ -115,13 +115,7 @@ private fun HomeTopBar(
                             searchJob.launch {
                                 delay(SEARCH_DELAY)
                                 if (newValue == searchText) {
-                                    if (newValue.isEmpty()) {
-                                        viewModel.getCharacters(
-                                            INITIAL_PAGE,
-                                            PAGE_SIZE,
-                                            true
-                                        )
-                                    } else {
+                                    if (newValue.isNotEmpty()) {
                                         viewModel.getCharacterByName(
                                             INITIAL_PAGE,
                                             PAGE_SIZE,
