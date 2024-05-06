@@ -5,7 +5,7 @@ data class CharacterDomain(
     val name: String?,
     val image: String?,
     val description: String?,
-    val comics: List<Comic>
+    val numberOfComics: Int
 )
 
 data class Comic(
