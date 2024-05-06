@@ -30,7 +30,7 @@ class DetailViewModel @Inject constructor(
 
     fun getCharacterDetail(id: Int) {
         viewModelScope.launch {
-            state = state.copy(isLoading = true)
+            state = state.copy(isLoading = true, error = null)
             try {
                 characterUseCase.getCharacterById(id).collect { character ->
                     state = state.copy(

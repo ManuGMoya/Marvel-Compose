@@ -4,6 +4,7 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,6 +18,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -46,12 +48,15 @@ import com.manudev.domain.model.CharacterDomain
 import com.manudev.presentation.R
 import com.manudev.presentation.screens.Screen
 import com.manudev.presentation.theme.CharacterImageSize
+import com.manudev.presentation.theme.Padding16
+import com.manudev.presentation.theme.Padding32
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 private const val SEARCH_DELAY = 400L
 private const val INITIAL_PAGE = 0
 private const val PAGE_SIZE = 20
+private const val ANIMATION_DURATION = 1000
 
 @Composable
 fun HomeScreen(
@@ -72,7 +77,10 @@ fun HomeScreen(
                 viewModel.state,
                 paddingValues,
                 onItemClick = onItemClick,
-                onRefreshList = viewModel::getCharacters
+                onRefreshList = viewModel::getCharacters,
+                onRetry = {
+                    viewModel.getCharacters(INITIAL_PAGE, PAGE_SIZE, true)
+                }
             )
         }
     )
@@ -95,7 +103,7 @@ private fun HomeTopBar(
     Crossfade(
         targetState = isSearchMode,
         label = "",
-        animationSpec = tween(1000)
+        animationSpec = tween(ANIMATION_DURATION)
     ) { searchMode ->
         TopAppBar(
             title = {
@@ -159,7 +167,8 @@ fun HomeContent(
     state: HomeViewModel.UiState,
     paddingValues: PaddingValues,
     onItemClick: (Int) -> Unit,
-    onRefreshList: (Int, Int) -> Unit
+    onRefreshList: (Int, Int) -> Unit,
+    onRetry: () -> Unit
 ) {
     Screen {
         when {
@@ -171,7 +180,18 @@ fun HomeContent(
 
             state.error != null -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(text = state.error)
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = state.error,
+                            modifier = Modifier.padding(Padding32)
+                        )
+                        Button(
+                            onClick = { onRetry.invoke() },
+                            modifier = Modifier.padding(Padding16)
+                        ) {
+                            Text(text = stringResource(R.string.Retry))
+                        }
+                    }
                 }
             }
 

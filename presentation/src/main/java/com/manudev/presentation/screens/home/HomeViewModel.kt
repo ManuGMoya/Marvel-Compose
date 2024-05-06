@@ -27,7 +27,7 @@ class HomeViewModel @Inject constructor(
 
     fun getCharacters(offset: Int, limit: Int, reset: Boolean = false) {
         viewModelScope.launch {
-            state = state.copy(isLoading = true)
+            state = state.copy(isLoading = true, error = null)
             try {
                 characterUseCase.getCharacters(offset, limit).collect { newCharacters ->
                     state = state.copy(
