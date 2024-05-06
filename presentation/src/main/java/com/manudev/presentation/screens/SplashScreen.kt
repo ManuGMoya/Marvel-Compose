@@ -14,7 +14,7 @@ import coil.compose.AsyncImage
 import com.manudev.presentation.R
 import kotlinx.coroutines.delay
 
-private const val DELAY_TIME = 3000L
+private const val DELAY_TIME = 2000L
 
 @Composable
 fun SplashScreen(navController: NavHostController) {

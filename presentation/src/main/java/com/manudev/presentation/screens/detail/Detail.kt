@@ -125,10 +125,15 @@ fun DetailContent(
                                 .height(DetailImageHeight)
                                 .fillMaxWidth()
                         )
-                        Spacer(modifier = Modifier.height(Padding8))
-                        Text(text = character.name ?: "")
-                        Spacer(modifier = Modifier.height(Padding8))
-                        Text(text = character.description ?: "")
+                        Text(
+                            text = character.name ?: "",
+                            modifier = Modifier.padding(Padding8), style = typography.titleMedium
+                        )
+                        Text(
+                            text = character.description ?: "",
+                            modifier = Modifier.padding(Padding8),
+                            style = typography.bodyMedium
+                        )
                         LazyColumn {
                             items(state.comics) { comic ->
                                 ComicItem(comic)
