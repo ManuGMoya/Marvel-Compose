@@ -1,15 +1,22 @@
 package com.manudev.presentation.screens.home
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
@@ -21,18 +28,22 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
@@ -40,6 +51,8 @@ import coil.request.ImageRequest
 import com.manudev.domain.model.CharacterDomain
 import com.manudev.presentation.R
 import com.manudev.presentation.screens.Screen
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -51,35 +64,69 @@ fun HomeScreen(
     val listState = rememberLazyListState()
     var isSearchMode by remember { mutableStateOf(false) }
 
+    var searchText by remember { mutableStateOf("") }
+    val searchJob = rememberCoroutineScope()
+
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    if (isSearchMode) {
-                        Text(text = stringResource(R.string.Search))
-                    } else {
-                        Text(text = stringResource(R.string.AppName))
-                    }
-                },
-                actions = {
-                    IconButton(onClick = {
-                        isSearchMode = !isSearchMode
-                    }) {
-                        if (isSearchMode) {
-                            Icon(
-                                imageVector = Icons.Default.Close,
-                                contentDescription = stringResource(R.string.Close)
+            Crossfade(
+                targetState = isSearchMode,
+                label = "",
+                animationSpec = tween(1000)
+            ) { searchMode ->
+                TopAppBar(
+                    title = {
+                        if (searchMode) {
+                            TextField(
+                                value = searchText,
+                                onValueChange = { newValue ->
+                                    searchText = newValue
+                                    searchJob.launch {
+                                        delay(400)
+                                        if (newValue == searchText) {
+                                            if (newValue.isEmpty()) {
+                                                viewModel.getCharacters(0, 20, true)
+                                            } else {
+                                                viewModel.getCharacterByName(0, 20, newValue)
+                                            }
+                                        }
+                                    }
+                                },
+                                label = { Text(stringResource(R.string.Search)) },
+                                singleLine = true,
+                                keyboardActions = KeyboardActions(onDone = {
+                                    searchJob.launch {
+                                        viewModel.getCharacterByName(0, 20, searchText)
+                                    }
+                                }),
+                                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(Color.Transparent)
                             )
                         } else {
-                            Icon(
-                                imageVector = Icons.Default.Search,
-                                contentDescription = stringResource(R.string.Search)
-                            )
+                            Text(text = stringResource(R.string.AppName))
                         }
-
+                    },
+                    actions = {
+                        IconButton(onClick = {
+                            isSearchMode = !isSearchMode
+                        }) {
+                            if (searchMode) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = stringResource(R.string.Close)
+                                )
+                            } else {
+                                Icon(
+                                    imageVector = Icons.Default.Search,
+                                    contentDescription = stringResource(R.string.Search)
+                                )
+                            }
+                        }
                     }
-                }
-            )
+                )
+            }
         },
         content = {
             HomeContent(
@@ -92,7 +139,7 @@ fun HomeScreen(
     )
 
     LaunchedEffect(Unit) {
-        viewModel.getCharacters(0, 20)
+        viewModel.getCharacters(0, 20, true)
     }
 }
 
@@ -118,7 +165,10 @@ fun HomeContent(
             }
 
             else -> {
-                LazyColumn(state = listState) {
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier.padding(top = 56.dp)
+                ) {
                     itemsIndexed(state.characters) { index, character ->
                         if (index > 0) Divider()
                         CharacterItem(
@@ -159,7 +209,7 @@ fun CharacterItem(
         },
         supportingContent = {
             Text(
-                text = character.comics.size.toString(),
+                text = "${stringResource(R.string.Search)} ${character.numberOfComics}"
             )
         },
         modifier = Modifier

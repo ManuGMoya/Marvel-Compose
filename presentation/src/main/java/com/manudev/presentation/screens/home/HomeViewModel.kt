@@ -32,7 +32,10 @@ class HomeViewModel @Inject constructor(
                 characterUseCase.getCharacters(offset, limit).collect { newCharacters ->
                     state = state.copy(
                         isLoading = false,
-                        characters = if (reset) newCharacters else state.characters + newCharacters
+                        characters = if (reset)
+                            newCharacters
+                        else
+                            (state.characters + newCharacters).distinctBy { it.id }
                     )
                 }
             } catch (e: Exception) {
@@ -49,7 +52,7 @@ class HomeViewModel @Inject constructor(
                     .collect { newCharacters ->
                         state = state.copy(
                             isLoading = false,
-                            characters = newCharacters
+                            characters = newCharacters.distinctBy { it.id }
                         )
                     }
             } catch (e: Exception) {
