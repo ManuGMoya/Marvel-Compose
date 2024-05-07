@@ -57,7 +57,7 @@ fun Detail(
         topBar = {
             TopAppBar(
                 title = { Text(text = stringResource(R.string.Detail)) },
-                actions = {
+                navigationIcon = {
                     IconButton(onClick = {
                         navController.popBackStack()
 
@@ -118,36 +118,40 @@ fun DetailContent(
             else -> {
                 val character = state.character
                 if (character != null) {
-                    Column(
+                    LazyColumn(
                         modifier = Modifier.padding(paddingValues),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        AsyncImage(
-                            model = character.image,
-                            contentDescription = character.name,
-                            modifier = Modifier
-                                .height(DetailImageHeight)
-                                .fillMaxWidth()
-                        )
-                        character.name?.let {
-                            Text(
-                                text = it,
-                                modifier = Modifier.padding(Padding8),
-                                style = typography.titleMedium,
+                        item {
+                            AsyncImage(
+                                model = character.image,
+                                contentDescription = character.name,
+                                modifier = Modifier
+                                    .height(DetailImageHeight)
+                                    .fillMaxWidth()
                             )
                         }
-                        character.description?.let {
-                            Text(
-                                text = it,
-                                modifier = Modifier.padding(Padding8),
-                                style = typography.bodyMedium
-                            )
-                        }
-                        LazyColumn {
-                            items(state.comics) { comic ->
-                                ComicItem(comic)
+                        item {
+                            character.name?.let {
+                                Text(
+                                    text = it,
+                                    modifier = Modifier.padding(Padding8),
+                                    style = typography.titleMedium,
+                                )
                             }
+                        }
+                        item {
+                            character.description?.let {
+                                Text(
+                                    text = it,
+                                    modifier = Modifier.padding(Padding8),
+                                    style = typography.bodyMedium
+                                )
+                            }
+                        }
+                        items(state.comics) { comic ->
+                            ComicItem(comic)
                         }
                     }
                 }
