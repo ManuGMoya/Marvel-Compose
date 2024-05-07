@@ -1,6 +1,7 @@
 package com.manudev.presentation.screens.detail
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,7 +14,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -62,7 +63,7 @@ fun Detail(
 
                     }) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.Back)
                         )
                     }
@@ -117,7 +118,11 @@ fun DetailContent(
             else -> {
                 val character = state.character
                 if (character != null) {
-                    Column(modifier = Modifier.padding(paddingValues)) {
+                    Column(
+                        modifier = Modifier.padding(paddingValues),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
                         AsyncImage(
                             model = character.image,
                             contentDescription = character.name,
@@ -125,15 +130,20 @@ fun DetailContent(
                                 .height(DetailImageHeight)
                                 .fillMaxWidth()
                         )
-                        Text(
-                            text = character.name ?: "",
-                            modifier = Modifier.padding(Padding8), style = typography.titleMedium
-                        )
-                        Text(
-                            text = character.description ?: "",
-                            modifier = Modifier.padding(Padding8),
-                            style = typography.bodyMedium
-                        )
+                        character.name?.let {
+                            Text(
+                                text = it,
+                                modifier = Modifier.padding(Padding8),
+                                style = typography.titleMedium,
+                            )
+                        }
+                        character.description?.let {
+                            Text(
+                                text = it,
+                                modifier = Modifier.padding(Padding8),
+                                style = typography.bodyMedium
+                            )
+                        }
                         LazyColumn {
                             items(state.comics) { comic ->
                                 ComicItem(comic)
