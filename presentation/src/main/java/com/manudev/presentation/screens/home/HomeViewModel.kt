@@ -6,54 +6,52 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.manudev.domain.model.CharacterDomain
-import com.manudev.domain.usecases.character.CharacterUseCase
+import com.manudev.domain.usecases.character.GetCharacterByNameUseCase
+import com.manudev.domain.usecases.character.GetCharactersUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+sealed class HomeViewState {
+    data object Loading : HomeViewState()
+    data class Success(val characters: List<CharacterDomain>) : HomeViewState()
+    data class Error(val error: String) : HomeViewState()
+}
+
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val characterUseCase: CharacterUseCase
+    private val getCharactersUseCase: GetCharactersUseCase,
+    private val getCharacterByNameUseCase: GetCharacterByNameUseCase
 ) : ViewModel() {
 
-    var state by mutableStateOf(UiState(isLoading = true))
-
-    data class UiState(
-        val isLoading: Boolean = false,
-        val characters: List<CharacterDomain> = emptyList(),
-        val error: String? = null
-    )
-
+    var state by mutableStateOf<HomeViewState>(HomeViewState.Loading)
 
     fun getCharacters(offset: Int, limit: Int) {
         viewModelScope.launch {
-            state = state.copy(isLoading = true, error = null)
+            val currentCharacters = (state as? HomeViewState.Success)?.characters ?: emptyList()
+
+            state = HomeViewState.Loading
             try {
-                characterUseCase.getCharacters(offset, limit).collect { newCharacters ->
-                    state = state.copy(
-                        isLoading = false,
-                        characters = (state.characters + newCharacters).distinctBy { it.id }
-                    )
+                getCharactersUseCase.execute(offset, limit).collect { newCharacters ->
+                    val updatedCharacters = currentCharacters + newCharacters
+                    state = HomeViewState.Success(updatedCharacters)
                 }
             } catch (e: Exception) {
-                state = state.copy(isLoading = false, error = e.message)
+                state = HomeViewState.Error(e.message ?: "Unknown error")
             }
         }
     }
 
     fun getCharacterByName(offset: Int, limit: Int, nameStartsWith: String) {
         viewModelScope.launch {
-            state = state.copy(isLoading = true)
+            state = HomeViewState.Loading
             try {
-                characterUseCase.getCharacterByName(offset, limit, nameStartsWith)
+                getCharacterByNameUseCase.execute(offset, limit, nameStartsWith)
                     .collect { newCharacters ->
-                        state = state.copy(
-                            isLoading = false,
-                            characters = newCharacters.distinctBy { it.id }
-                        )
+                        state = HomeViewState.Success(newCharacters)
                     }
             } catch (e: Exception) {
-                state = state.copy(isLoading = false, error = e.message)
+                state = HomeViewState.Error(e.message ?: "Unknown error")
             }
         }
     }

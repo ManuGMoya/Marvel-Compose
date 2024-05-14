@@ -86,19 +86,19 @@ fun Detail(
 
 @Composable
 fun DetailContent(
-    state: DetailViewModel.UiState,
+    state: DetailViewState,
     paddingValues: PaddingValues,
     onRetry: () -> Unit
 ) {
     Screen {
-        when {
-            state.isLoading -> {
+        when (state) {
+            is DetailViewState.Loading -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
             }
 
-            state.error != null -> {
+            is DetailViewState.Error -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
@@ -116,7 +116,7 @@ fun DetailContent(
             }
 
             else -> {
-                val character = state.character
+                val character = (state as? DetailViewState.Success)?.character
                 if (character != null) {
                     LazyColumn(
                         modifier = Modifier.padding(paddingValues),

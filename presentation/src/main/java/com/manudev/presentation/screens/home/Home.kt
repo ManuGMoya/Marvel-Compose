@@ -2,6 +2,7 @@ package com.manudev.presentation.screens.home
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,7 +20,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -39,6 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -64,6 +65,7 @@ fun HomeScreen(
     onItemClick: (Int) -> Unit
 ) {
     val listState = rememberLazyListState()
+    var hasLoadedCharacters by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -86,8 +88,9 @@ fun HomeScreen(
     )
 
     LaunchedEffect(Unit) {
-        if (viewModel.state.characters.isEmpty()) {
+        if (!hasLoadedCharacters) {
             viewModel.getCharacters(INITIAL_PAGE, PAGE_SIZE)
+            hasLoadedCharacters = true
         }
     }
 }
@@ -160,21 +163,16 @@ private fun HomeTopBar(
 @Composable
 fun HomeContent(
     listState: LazyListState,
-    state: HomeViewModel.UiState,
+    state: HomeViewState,
     paddingValues: PaddingValues,
     onItemClick: (Int) -> Unit,
     onRefreshList: (Int, Int) -> Unit,
     onRetry: () -> Unit
 ) {
     Screen {
-        when {
-            state.isLoading && state.characters.isEmpty() -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
-                }
-            }
+        when (state) {
 
-            state.error != null -> {
+            is HomeViewState.Error -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
@@ -191,7 +189,7 @@ fun HomeContent(
                 }
             }
 
-            else -> {
+            is HomeViewState.Success -> {
                 LazyColumn(
                     state = listState,
                     modifier = Modifier.padding(paddingValues)
@@ -209,12 +207,14 @@ fun HomeContent(
                             }
                         }
                     }
-                    item {
-                        if (state.isLoading) {
-                            Box(modifier = Modifier.fillMaxWidth().padding(Padding16), contentAlignment = Alignment.Center) {
-                                CircularProgressIndicator()
-                            }
-                        }
+                }
+            }
+
+            HomeViewState.Loading -> {
+                LazyColumn {
+                    items(20) { count ->
+                        if (count > 0) Divider()
+                        CharacterItemSkeleton()
                     }
                 }
             }
@@ -250,3 +250,22 @@ fun CharacterItem(
             .clickable { onItemClick() }
     )
 }
+
+@Composable
+private fun CharacterItemSkeleton() {
+    ListItem(
+        headlineContent = { Text(text = "Loading...", color = Color.LightGray) },
+        leadingContent = {
+            Box(
+                modifier = Modifier
+                    .size(CharacterImageSize)
+                    .clip(CircleShape)
+                    .background(Color.LightGray)
+            )
+        },
+        supportingContent = {
+            Text(text = "Loading...", color = Color.LightGray)
+        }
+    )
+}
+

@@ -5,16 +5,16 @@ import kotlinx.coroutines.flow.Flow
 
 interface ICharacterRepository {
 
-    fun getCharacters(
+    suspend fun getCharacters(
         offset: Int,
         limit: Int,
     ): Flow<List<CharacterDomain>>
 
-    fun getCharacterById(
+    suspend fun getCharacterById(
         characterId: Int,
     ): Flow<CharacterDomain>
 
-    fun getCharacterByName(
+    suspend fun getCharacterByName(
         offset: Int,
         limit: Int,
         nameStartsWith: String
