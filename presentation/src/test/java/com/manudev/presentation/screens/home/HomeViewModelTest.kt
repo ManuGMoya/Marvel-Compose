@@ -1,34 +1,37 @@
 package com.manudev.presentation.screens.home
 
-
+import com.manudev.domain.APIResponseStatus
 import com.manudev.domain.model.CharacterDomain
-import com.manudev.domain.usecases.character.CharacterUseCase
+import com.manudev.domain.usecases.character.GetCharacterByNameUseCase
+import com.manudev.domain.usecases.character.GetCharactersUseCase
 import com.manudev.presentation.BaseTestCoroutine
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.impl.annotations.RelaxedMockK
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 @RunWith(JUnit4::class)
-class HomeViewModelTest() : BaseTestCoroutine() {
+class HomeViewModelTest : BaseTestCoroutine() {
 
     private lateinit var viewModel: HomeViewModel
 
     @RelaxedMockK
-    private lateinit var characterUseCase: CharacterUseCase
+    private lateinit var getCharactersUseCase: GetCharactersUseCase
+
+    @RelaxedMockK
+    private lateinit var getCharacterByNameUseCase: GetCharacterByNameUseCase
 
     override fun setUp() {
         super.setUp()
         MockKAnnotations.init(this)
-        viewModel = HomeViewModel(characterUseCase)
+        viewModel = HomeViewModel(getCharactersUseCase, getCharacterByNameUseCase)
     }
 
     @Test
@@ -50,29 +53,32 @@ class HomeViewModelTest() : BaseTestCoroutine() {
                     description = ""
                 ),
             )
-            coEvery { characterUseCase.getCharacters(any(), any()) } returns flowOf(characters)
-
+            coEvery {
+                getCharactersUseCase.execute(
+                    any(),
+                    any()
+                )
+            } returns flowOf(APIResponseStatus.Success(characters))
 
             viewModel.getCharacters(0, 10)
 
-            assertEquals(characters, viewModel.state.characters)
-            assertFalse(viewModel.state.isLoading)
-            assertNull(viewModel.state.error)
+            assertTrue(viewModel.state is HomeViewState.Success)
+            val state = viewModel.state as HomeViewState.Success
+            assertEquals(characters, state.characters)
         }
 
     @Test
     fun `when getCharacters is invoked and an error occurs, it should update the state with the error message`() =
         runTest {
             val errorMessage = "Error message"
-            coEvery { characterUseCase.getCharacters(any(), any()) } throws Exception(errorMessage)
+            coEvery { getCharactersUseCase.execute(any(), any()) } returns flowOf(APIResponseStatus.Error(errorMessage))
 
             viewModel.getCharacters(0, 10)
 
-            assertTrue(viewModel.state.characters.isEmpty())
-            assertFalse(viewModel.state.isLoading)
-            assertEquals(errorMessage, viewModel.state.error)
+            assertTrue(viewModel.state is HomeViewState.Error)
+            val state = viewModel.state as HomeViewState.Error
+            assertEquals(errorMessage, state.error)
         }
-
 
     @Test
     fun `when getCharacterByName is invoked with valid parameters, it should update the state with the correct characters`() =
@@ -93,32 +99,25 @@ class HomeViewModelTest() : BaseTestCoroutine() {
                     description = ""
                 ),
             )
-            coEvery { characterUseCase.getCharacterByName(any(), any(), any()) } returns flowOf(
-                characters
-            )
-
+            coEvery { getCharacterByNameUseCase.execute(any(), any(), any()) } returns flowOf(APIResponseStatus.Success(characters))
 
             viewModel.getCharacterByName(0, 10, "Ch")
 
-
-            assertEquals(characters, viewModel.state.characters)
-            assertFalse(viewModel.state.isLoading)
-            assertNull(viewModel.state.error)
+            assertTrue(viewModel.state is HomeViewState.Success)
+            val state = viewModel.state as HomeViewState.Success
+            assertEquals(characters, state.characters)
         }
 
     @Test
     fun `when getCharacterByName is invoked and an error occurs, it should update the state with the error message`() =
-        runTest {
+        runBlockingTest {
             val errorMessage = "Error message"
-            coEvery { characterUseCase.getCharacterByName(any(), any(), any()) } throws Exception(
-                errorMessage
-            )
+            coEvery { getCharacterByNameUseCase.execute(any(), any(), any()) } returns flowOf(APIResponseStatus.Error(errorMessage))
 
             viewModel.getCharacterByName(0, 10, "Character")
 
-            assertTrue(viewModel.state.characters.isEmpty())
-            assertFalse(viewModel.state.isLoading)
-            assertEquals(errorMessage, viewModel.state.error)
+            assertTrue(viewModel.state is HomeViewState.Error)
+            val state = viewModel.state as HomeViewState.Error
+            assertEquals(errorMessage, state.error)
         }
-
 }

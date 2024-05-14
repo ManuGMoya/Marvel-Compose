@@ -1,7 +1,7 @@
 package com.manudev.data.character.remote.datasource
 
 import com.manudev.data.character.remote.model.CharacterDto
-import com.manudev.data.response.APIResponseStatus
+import com.manudev.domain.APIResponseStatus
 import com.manudev.data.response.DataWrapper
 
 interface CharacterRemoteDataSource {

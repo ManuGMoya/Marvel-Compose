@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.manudev.domain.APIResponseStatus
 import com.manudev.domain.model.CharacterDomain
 import com.manudev.domain.usecases.character.GetCharacterByNameUseCase
 import com.manudev.domain.usecases.character.GetCharactersUseCase
@@ -31,13 +32,13 @@ class HomeViewModel @Inject constructor(
             val currentCharacters = (state as? HomeViewState.Success)?.characters ?: emptyList()
 
             state = HomeViewState.Loading
-            try {
-                getCharactersUseCase.execute(offset, limit).collect { newCharacters ->
-                    val updatedCharacters = currentCharacters + newCharacters
+            getCharactersUseCase.execute(offset, limit).collect { response ->
+                if (response is APIResponseStatus.Success) {
+                    val updatedCharacters = currentCharacters + response.data
                     state = HomeViewState.Success(updatedCharacters)
+                } else {
+                    state = HomeViewState.Error((response as APIResponseStatus.Error).message)
                 }
-            } catch (e: Exception) {
-                state = HomeViewState.Error(e.message ?: "Unknown error")
             }
         }
     }
@@ -45,13 +46,12 @@ class HomeViewModel @Inject constructor(
     fun getCharacterByName(offset: Int, limit: Int, nameStartsWith: String) {
         viewModelScope.launch {
             state = HomeViewState.Loading
-            try {
-                getCharacterByNameUseCase.execute(offset, limit, nameStartsWith)
-                    .collect { newCharacters ->
-                        state = HomeViewState.Success(newCharacters)
-                    }
-            } catch (e: Exception) {
-                state = HomeViewState.Error(e.message ?: "Unknown error")
+            getCharacterByNameUseCase.execute(offset, limit, nameStartsWith).collect { response ->
+                state = if (response is APIResponseStatus.Success) {
+                    HomeViewState.Success(response.data)
+                } else {
+                    HomeViewState.Error((response as APIResponseStatus.Error).message)
+                }
             }
         }
     }

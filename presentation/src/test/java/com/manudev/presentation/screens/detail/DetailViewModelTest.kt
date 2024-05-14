@@ -1,20 +1,17 @@
 package com.manudev.presentation.screens.detail
 
 import com.manudev.domain.model.CharacterDomain
-import com.manudev.domain.usecases.character.CharacterUseCase
+import com.manudev.domain.usecases.character.GetCharacterByIdUseCase
 import com.manudev.domain.usecases.comic.ComicUseCase
 import com.manudev.presentation.BaseTestCoroutine
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.impl.annotations.RelaxedMockK
-import io.mockk.spyk
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,7 +23,7 @@ class DetailViewModelTest : BaseTestCoroutine() {
     private lateinit var viewModel: DetailViewModel
 
     @RelaxedMockK
-    private lateinit var characterUseCase: CharacterUseCase
+    private lateinit var getCharacterByIdUseCase: GetCharacterByIdUseCase
 
     @RelaxedMockK
     private lateinit var comicUseCase: ComicUseCase
@@ -34,13 +31,7 @@ class DetailViewModelTest : BaseTestCoroutine() {
     override fun setUp() {
         super.setUp()
         MockKAnnotations.init(this)
-        viewModel = spyk(
-            DetailViewModel(
-                characterUseCase,
-                comicUseCase
-            ),
-            recordPrivateCalls = true
-        )
+        viewModel = DetailViewModel(getCharacterByIdUseCase, comicUseCase)
     }
 
     @Test
@@ -53,27 +44,27 @@ class DetailViewModelTest : BaseTestCoroutine() {
                 numberOfComics = 5,
                 description = null
             )
-            coEvery { characterUseCase.getCharacterById(any()) } returns flowOf(character)
+            coEvery { getCharacterByIdUseCase.execute(any()) } returns flowOf(character)
 
             viewModel.getCharacterDetail(1)
 
-            assertEquals(character, viewModel.state.character)
-            assertNull(viewModel.state.error)
+            assertTrue(viewModel.state is DetailViewState.Success)
+            val state = viewModel.state as DetailViewState.Success
+            assertEquals(character, state.character)
         }
 
     @Test
     fun `when getCharacterDetail is called and an error occurs, it should update the state with the error message`() =
         runTest {
             val errorMessage = "Error message"
-            coEvery { characterUseCase.getCharacterById(any()) } throws Exception(errorMessage)
+            coEvery { getCharacterByIdUseCase.execute(any()) } throws Exception(errorMessage)
 
             viewModel.getCharacterDetail(1)
 
-            assertNull(viewModel.state.character)
-            assertFalse(viewModel.state.isLoading)
-            assertEquals(errorMessage, viewModel.state.error)
+            assertTrue(viewModel.state is DetailViewState.Error)
+            val state = viewModel.state as DetailViewState.Error
+            assertEquals(errorMessage, state.error)
         }
-
 
     @Test
     fun `when getCharacterDetail is called and succeeds, it should also call getComics with the correct character ID`() =
@@ -88,7 +79,7 @@ class DetailViewModelTest : BaseTestCoroutine() {
             )
             val response = flowOf(character)
 
-            coEvery { characterUseCase.getCharacterById(any()) } returns response
+            coEvery { getCharacterByIdUseCase.execute(any()) } returns response
 
             viewModel.getCharacterDetail(characterId)
 
@@ -96,7 +87,6 @@ class DetailViewModelTest : BaseTestCoroutine() {
                 comicUseCase.getComicById(characterId)
             }
         }
-
 
     @Test
     fun `when getCharacterDetail() is invoked and getComics() throws an error then the error state is updated`() =
@@ -110,15 +100,15 @@ class DetailViewModelTest : BaseTestCoroutine() {
                 description = null
             )
             val errorMessage = "Error message"
-            coEvery { characterUseCase.getCharacterById(any()) } returns flowOf(character)
+            coEvery { getCharacterByIdUseCase.execute(any()) } returns flowOf(character)
             coEvery { comicUseCase.getComicById(any()) } throws Exception(errorMessage)
 
             runBlocking {
                 viewModel.getCharacterDetail(characterId)
             }
 
-            assertTrue(viewModel.state.comics.isEmpty())
-            assertFalse(viewModel.state.isLoading)
-            assertEquals(errorMessage, viewModel.state.error)
+            assertTrue(viewModel.state is DetailViewState.Error)
+            val state = viewModel.state as DetailViewState.Error
+            assertEquals(errorMessage, state.error)
         }
 }

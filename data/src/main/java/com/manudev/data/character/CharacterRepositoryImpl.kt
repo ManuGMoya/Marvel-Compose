@@ -1,7 +1,7 @@
 package com.manudev.data.character
 
 import com.manudev.data.character.remote.datasource.CharacterRemoteDataSource
-import com.manudev.data.response.APIResponseStatus
+import com.manudev.domain.APIResponseStatus
 import com.manudev.domain.model.CharacterDomain
 import com.manudev.domain.repository.ICharacterRepository
 import kotlinx.coroutines.flow.Flow
@@ -12,56 +12,52 @@ class CharacterRepositoryImpl @Inject constructor(
     private val remote: CharacterRemoteDataSource
 ) : ICharacterRepository {
 
-    override suspend fun getCharacters(offset: Int, limit: Int): Flow<List<CharacterDomain>> =
+    override suspend fun getCharacters(
+        offset: Int,
+        limit: Int
+    ): Flow<APIResponseStatus<List<CharacterDomain>>> =
         flow {
-            when (val response = remote.getAllCharacter(offset, limit)) {
-                is APIResponseStatus.Success -> {
-                    emit(response.data.data?.results?.map {
-                        it.toDomain()
-                    } ?: emptyList())
-                }
-
-                is APIResponseStatus.Error -> {
-                    throw Exception(response.message)
-                }
+            val response = remote.getAllCharacter(offset, limit)
+            if (response is APIResponseStatus.Success) {
+                emit(APIResponseStatus.Success(response.data.data?.results?.map {
+                    it.toDomain()
+                } ?: emptyList()))
+            } else {
+                emit(APIResponseStatus.Error((response as APIResponseStatus.Error).message))
             }
         }
 
-    override suspend fun getCharacterById(characterId: Int): Flow<CharacterDomain> =
+    override suspend fun getCharacterById(characterId: Int): Flow<APIResponseStatus<CharacterDomain>> =
         flow {
             when (val response = remote.getCharacterById(characterId)) {
                 is APIResponseStatus.Success -> {
-                    emit(response.data.data?.results?.first()?.toDomain()!!)
+                    val character = response.data.data?.results?.first()?.toDomain()
+                    if (character != null) {
+                        emit(APIResponseStatus.Success(character))
+                    } else {
+                        emit(APIResponseStatus.Error("Character not found"))
+                    }
                 }
 
                 is APIResponseStatus.Error -> {
-                    throw Exception(response.message)
+                    emit(APIResponseStatus.Error(response.message))
                 }
             }
-
         }
 
     override suspend fun getCharacterByName(
         offset: Int,
         limit: Int,
         nameStartsWith: String
-    ): Flow<List<CharacterDomain>> =
+    ): Flow<APIResponseStatus<List<CharacterDomain>>> =
         flow {
-
-            when (val response = remote.getCharacterByStartName(
-                offset = offset,
-                limit = limit,
-                nameStartsWith = nameStartsWith
-            )) {
-                is APIResponseStatus.Success -> {
-                    emit(response.data.data?.results?.map {
-                        it.toDomain()
-                    } ?: emptyList())
-                }
-
-                is APIResponseStatus.Error -> {
-                    throw Exception(response.message)
-                }
+            val response = remote.getCharacterByStartName(offset, limit, nameStartsWith)
+            if (response is APIResponseStatus.Success) {
+                emit(APIResponseStatus.Success(response.data.data?.results?.map {
+                    it.toDomain()
+                } ?: emptyList()))
+            } else {
+                emit(APIResponseStatus.Error((response as APIResponseStatus.Error).message))
             }
         }
 }

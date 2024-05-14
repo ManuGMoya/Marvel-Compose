@@ -1,4 +1,4 @@
-package com.manudev.data.response
+package com.manudev.domain
 
 /**
  * A sealed class representing the status of an API response.

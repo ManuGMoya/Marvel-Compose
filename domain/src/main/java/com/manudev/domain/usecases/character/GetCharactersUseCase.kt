@@ -1,8 +1,9 @@
 package com.manudev.domain.usecases.character
 
+import com.manudev.domain.APIResponseStatus
 import com.manudev.domain.model.CharacterDomain
 import kotlinx.coroutines.flow.Flow
 
 interface GetCharactersUseCase {
-    suspend fun execute(offset: Int, limit: Int): Flow<List<CharacterDomain>>
+    suspend fun execute(offset: Int, limit: Int): Flow<APIResponseStatus<List<CharacterDomain>>>
 }

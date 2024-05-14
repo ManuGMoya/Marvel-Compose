@@ -1,7 +1,7 @@
 package com.manudev.data.comic
 
 import com.manudev.data.comic.remote.datasource.ComicRemoteDataSource
-import com.manudev.data.response.APIResponseStatus
+import com.manudev.domain.APIResponseStatus
 import com.manudev.domain.model.ComicDomain
 import com.manudev.domain.repository.IComicRepository
 import kotlinx.coroutines.flow.Flow
@@ -12,18 +12,20 @@ class ComicRepositoryImpl @Inject constructor(
     private val remote: ComicRemoteDataSource
 ) : IComicRepository {
 
-
-    override fun getComicsById(id: Int): Flow<List<ComicDomain>> =
+    override suspend fun getComicsById(characterId: Int): Flow<APIResponseStatus<List<ComicDomain>>> =
         flow {
-            when (val response = remote.getComicById(id)) {
+            when (val response = remote.getComicById(characterId)) {
                 is APIResponseStatus.Success -> {
-                    emit(response.data.data?.results?.map {
-                        it.toDomain()
-                    } ?: emptyList())
+                    val comics = response.data.data?.results?.map { it.toDomain() }
+                    if (comics != null) {
+                        emit(APIResponseStatus.Success(comics))
+                    } else {
+                        emit(APIResponseStatus.Error("Comics not found"))
+                    }
                 }
 
                 is APIResponseStatus.Error -> {
-                    throw Exception(response.message)
+                    emit(APIResponseStatus.Error(response.message))
                 }
             }
         }

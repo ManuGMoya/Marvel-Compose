@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.manudev.domain.APIResponseStatus
 import com.manudev.domain.model.CharacterDomain
 import com.manudev.domain.model.ComicDomain
 import com.manudev.domain.usecases.character.GetCharacterByIdUseCase
@@ -32,32 +33,39 @@ class DetailViewModel @Inject constructor(
     fun getCharacterDetail(id: Int) {
         viewModelScope.launch {
             state = DetailViewState.Loading
-            try {
-                getCharacterById.execute(id).collect { character ->
-                    state = DetailViewState.Success(character, emptyList())
-                    character.id?.let { getComics(it) }
+            getCharacterById.execute(id).collect { response ->
+                when (response) {
+                    is APIResponseStatus.Success -> {
+                        state = DetailViewState.Success(response.data, emptyList())
+                        response.data.id?.let { getComics(it) }
+                    }
+
+                    is APIResponseStatus.Error -> {
+                        state = DetailViewState.Error(response.message)
+                    }
                 }
-            } catch (e: Exception) {
-                state = DetailViewState.Error(e.message ?: "Unknown error")
             }
         }
     }
 
     private fun getComics(characterId: Int) {
         viewModelScope.launch {
-            try {
-                comicUseCase.getComicById(characterId).collect { comics ->
-                    val character = (state as? DetailViewState.Success)?.character
-                    if (character != null) {
-                        state = DetailViewState.Success(character, comics)
+            comicUseCase.getComicById(characterId).collect { response ->
+                when (response) {
+                    is APIResponseStatus.Success -> {
+                        val character = (state as? DetailViewState.Success)?.character
+                        if (character != null) {
+                            state = DetailViewState.Success(character, response.data)
+                        }
+                    }
+
+                    is APIResponseStatus.Error -> {
+                        state = DetailViewState.Error(response.message)
                     }
                 }
-            } catch (e: Exception) {
-                state = DetailViewState.Error(e.message ?: "Unknown error")
             }
         }
     }
-
 
 }
 
