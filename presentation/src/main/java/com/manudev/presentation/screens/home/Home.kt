@@ -168,7 +168,7 @@ fun HomeContent(
 ) {
     Screen {
         when {
-            state.isLoading -> {
+            state.isLoading && state.characters.isEmpty() -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
@@ -206,6 +206,13 @@ fun HomeContent(
                             onRefreshList(index + 1, PAGE_SIZE)
                             LaunchedEffect(Unit) {
                                 listState.scrollToItem(index)
+                            }
+                        }
+                    }
+                    item {
+                        if (state.isLoading) {
+                            Box(modifier = Modifier.fillMaxWidth().padding(Padding16), contentAlignment = Alignment.Center) {
+                                CircularProgressIndicator()
                             }
                         }
                     }
