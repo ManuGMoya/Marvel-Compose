@@ -9,12 +9,13 @@ import com.manudev.domain.APIResponseStatus
 import com.manudev.domain.model.CharacterDomain
 import com.manudev.domain.usecases.character.GetCharacterByNameUseCase
 import com.manudev.domain.usecases.character.GetCharactersUseCase
-import com.manudev.domain.usecases.character.GetCharactersUseCaseImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 sealed class HomeViewState {
+
+    data object Initial : HomeViewState()
     data object Loading : HomeViewState()
     data class Success(val characters: List<CharacterDomain>) : HomeViewState()
     data class Error(val error: String) : HomeViewState()
@@ -26,9 +27,10 @@ class HomeViewModel @Inject constructor(
     private val getCharacterByNameUseCase: GetCharacterByNameUseCase
 ) : ViewModel() {
 
-    var state by mutableStateOf<HomeViewState>(HomeViewState.Loading)
+    var state by mutableStateOf<HomeViewState>(HomeViewState.Initial)
 
     fun getCharacters(offset: Int, limit: Int) {
+        if (state is HomeViewState.Loading) return
         viewModelScope.launch {
             val currentCharacters = (state as? HomeViewState.Success)?.characters ?: emptyList()
 

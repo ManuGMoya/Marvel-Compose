@@ -20,8 +20,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -195,7 +195,7 @@ fun HomeContent(
                     modifier = Modifier.padding(paddingValues)
                 ) {
                     itemsIndexed(state.characters) { index, character ->
-                        if (index > INITIAL_PAGE) Divider()
+                        if (index > INITIAL_PAGE) HorizontalDivider()
                         CharacterItem(
                             character = character,
                             onItemClick = { character.id?.let { onItemClick(it) } }
@@ -213,10 +213,14 @@ fun HomeContent(
             HomeViewState.Loading -> {
                 LazyColumn {
                     items(20) { count ->
-                        if (count > 0) Divider()
+                        if (count > 0) HorizontalDivider()
                         CharacterItemSkeleton()
                     }
                 }
+            }
+
+            HomeViewState.Initial -> {
+                // Do nothing
             }
         }
     }
@@ -254,7 +258,12 @@ fun CharacterItem(
 @Composable
 private fun CharacterItemSkeleton() {
     ListItem(
-        headlineContent = { Text(text = "Loading...", color = Color.LightGray) },
+        headlineContent = {
+            Text(
+                text = stringResource(id = R.string.loading),
+                color = Color.LightGray
+            )
+        },
         leadingContent = {
             Box(
                 modifier = Modifier
@@ -264,7 +273,7 @@ private fun CharacterItemSkeleton() {
             )
         },
         supportingContent = {
-            Text(text = "Loading...", color = Color.LightGray)
+            Text(text = stringResource(id = R.string.loading), color = Color.LightGray)
         }
     )
 }

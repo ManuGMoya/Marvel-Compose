@@ -9,4 +9,5 @@
     <string name="Retry">Retry</string>
     <string name="logo">logo</string>
     <string name="welcome_to_marvel_world">Welcome to Marvel World!</string>
+    <string name="loading">Loading…</string>
 </resources>

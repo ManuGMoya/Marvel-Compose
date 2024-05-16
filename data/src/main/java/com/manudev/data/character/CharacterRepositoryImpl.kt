@@ -1,6 +1,7 @@
 package com.manudev.data.character
 
 import com.manudev.data.character.remote.CharacterApi
+import com.manudev.data.utils.Network.safeCall
 import com.manudev.domain.APIResponseStatus
 import com.manudev.domain.model.CharacterDomain
 import com.manudev.domain.repository.ICharacterRepository
@@ -17,36 +18,29 @@ class CharacterRepositoryImpl @Inject constructor(
         limit: Int
     ): Flow<APIResponseStatus<List<CharacterDomain>>> =
         flow {
-            try {
-                val response = service.getAllCharacters(offset, limit)
-                if (response.isSuccessful) {
-                    val characters =
-                        response.body()?.data?.results?.map { it.toDomain() } ?: emptyList()
+            when (val response = service.getAllCharacters(offset, limit).safeCall()) {
+                is APIResponseStatus.Success -> {
+                    val characters = response.data.data?.results!!.map { it.toDomain() }
                     emit(APIResponseStatus.Success(characters))
-                } else {
-                    emit(APIResponseStatus.Error("Error: ${response.code()}"))
                 }
-            } catch (e: Exception) {
-                emit(APIResponseStatus.Error(e.message ?: "Unknown error"))
+
+                is APIResponseStatus.Error -> {
+                    emit(APIResponseStatus.Error(response.message))
+                }
             }
         }
 
     override suspend fun getCharacterById(characterId: Int): Flow<APIResponseStatus<CharacterDomain>> =
         flow {
-            try {
-                val response = service.getCharacterById(characterId)
-                if (response.isSuccessful) {
-                    val character = response.body()?.data?.results?.first()?.toDomain()
-                    if (character != null) {
-                        emit(APIResponseStatus.Success(character))
-                    } else {
-                        emit(APIResponseStatus.Error("Character not found"))
-                    }
-                } else {
-                    emit(APIResponseStatus.Error("Error: ${response.code()}"))
+            when (val response = service.getCharacterById(characterId).safeCall()) {
+                is APIResponseStatus.Success -> {
+                    val character = response.data.data?.results!!.first().toDomain()
+                    emit(APIResponseStatus.Success(character))
                 }
-            } catch (e: Exception) {
-                emit(APIResponseStatus.Error(e.message ?: "Unknown error"))
+
+                is APIResponseStatus.Error -> {
+                    emit(APIResponseStatus.Error(response.message))
+                }
             }
         }
 
@@ -56,17 +50,16 @@ class CharacterRepositoryImpl @Inject constructor(
         nameStartsWith: String
     ): Flow<APIResponseStatus<List<CharacterDomain>>> =
         flow {
-            try {
-                val response = service.getCharacterByStartName(offset, limit, nameStartsWith)
-                if (response.isSuccessful) {
-                    val characters =
-                        response.body()?.data?.results?.map { it.toDomain() } ?: emptyList()
+            when (val response =
+                service.getCharacterByStartName(offset, limit, nameStartsWith).safeCall()) {
+                is APIResponseStatus.Success -> {
+                    val characters = response.data.data?.results!!.map { it.toDomain() }
                     emit(APIResponseStatus.Success(characters))
-                } else {
-                    emit(APIResponseStatus.Error("Error: ${response.code()}"))
                 }
-            } catch (e: Exception) {
-                emit(APIResponseStatus.Error(e.message ?: "Unknown error"))
+
+                is APIResponseStatus.Error -> {
+                    emit(APIResponseStatus.Error(response.message))
+                }
             }
         }
 }

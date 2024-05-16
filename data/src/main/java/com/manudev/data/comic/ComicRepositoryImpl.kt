@@ -1,6 +1,7 @@
 package com.manudev.data.comic
 
 import com.manudev.data.comic.remote.ComicApi
+import com.manudev.data.utils.Network.safeCall
 import com.manudev.domain.APIResponseStatus
 import com.manudev.domain.model.ComicDomain
 import com.manudev.domain.repository.IComicRepository
@@ -14,20 +15,19 @@ class ComicRepositoryImpl @Inject constructor(
 
     override suspend fun getComicsById(characterId: Int): Flow<APIResponseStatus<List<ComicDomain>>> =
         flow {
-            try {
-                val response = service.getComicById(characterId)
-                if (response.isSuccessful) {
-                    val comics = response.body()?.data?.results?.map { it.toDomain() }
+            when (val response = service.getComicById(characterId).safeCall()) {
+                is APIResponseStatus.Success -> {
+                    val comics = response.data.data?.results?.map { it.toDomain() }
                     if (comics != null) {
                         emit(APIResponseStatus.Success(comics))
                     } else {
                         emit(APIResponseStatus.Error("Comics not found"))
                     }
-                } else {
-                    emit(APIResponseStatus.Error("Error: ${response.code()}"))
                 }
-            } catch (e: Exception) {
-                emit(APIResponseStatus.Error(e.message ?: "Unknown error"))
+
+                is APIResponseStatus.Error -> {
+                    emit(APIResponseStatus.Error(response.message))
+                }
             }
         }
 }
