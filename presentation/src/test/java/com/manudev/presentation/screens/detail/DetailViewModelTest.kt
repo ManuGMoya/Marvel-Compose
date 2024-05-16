@@ -1,6 +1,5 @@
 package com.manudev.presentation.screens.detail
 
-import com.manudev.domain.APIResponseStatus
 import com.manudev.domain.model.CharacterDomain
 import com.manudev.domain.usecases.character.GetCharacterByIdUseCase
 import com.manudev.domain.usecases.comic.ComicUseCase
@@ -93,7 +92,7 @@ class DetailViewModelTest : BaseTestCoroutine() {
             viewModel.getCharacterDetail(characterId)
 
             coVerify {
-                comicUseCase.getComicById(characterId)
+                comicUseCase.execute(characterId)
             }
         }
 
@@ -114,7 +113,7 @@ class DetailViewModelTest : BaseTestCoroutine() {
                     character
                 )
             )
-            coEvery { comicUseCase.getComicById(any()) } returns flowOf(
+            coEvery { comicUseCase.execute(any()) } returns flowOf(
                 APIResponseStatus.Error(
                     errorMessage
                 )

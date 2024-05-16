@@ -1,8 +1,6 @@
 package com.manudev.data.comic
 
 import com.manudev.data.comic.remote.ComicApi
-import com.manudev.data.utils.Network.safeCall
-import com.manudev.domain.APIResponseStatus
 import com.manudev.domain.model.ComicDomain
 import com.manudev.domain.repository.IComicRepository
 import kotlinx.coroutines.flow.Flow
@@ -13,21 +11,20 @@ class ComicRepositoryImpl @Inject constructor(
     private val service: ComicApi
 ) : IComicRepository {
 
-    override suspend fun getComicsById(characterId: Int): Flow<APIResponseStatus<List<ComicDomain>>> =
+    override suspend fun getComicsById(characterId: Int): Flow<Result<List<ComicDomain>>> =
         flow {
-            when (val response = service.getComicById(characterId).safeCall()) {
-                is APIResponseStatus.Success -> {
-                    val comics = response.data.data?.results?.map { it.toDomain() }
-                    if (comics != null) {
-                        emit(APIResponseStatus.Success(comics))
-                    } else {
-                        emit(APIResponseStatus.Error("Comics not found"))
-                    }
-                }
 
-                is APIResponseStatus.Error -> {
-                    emit(APIResponseStatus.Error(response.message))
+            val response = service.getComicById(characterId)
+
+            if (response.isSuccessful) {
+                val comics = response.body()?.data?.results?.map { it.toDomain() }
+                if (comics != null) {
+                    emit(Result.success(comics))
+                } else {
+                    emit(Result.failure(Exception("No comics found")))
                 }
+            } else {
+                emit(Result.failure(Exception(response.message())))
             }
         }
 }

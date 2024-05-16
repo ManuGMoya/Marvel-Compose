@@ -1,6 +1,5 @@
 package com.manudev.domain.usecases.character
 
-import com.manudev.domain.APIResponseStatus
 import com.manudev.domain.model.CharacterDomain
 import com.manudev.domain.repository.ICharacterRepository
 import kotlinx.coroutines.flow.Flow
@@ -13,6 +12,6 @@ class GetCharacterByNameUseCaseImpl @Inject constructor(
         offset: Int,
         limit: Int,
         nameStartsWith: String
-    ): Flow<APIResponseStatus<List<CharacterDomain>>> =
+    ): Flow<Result<List<CharacterDomain>>> =
         characterRepository.getCharacterByName(offset, limit, nameStartsWith)
 }

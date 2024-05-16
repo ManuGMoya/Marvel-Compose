@@ -1,6 +1,5 @@
 package com.manudev.presentation.screens.home
 
-import com.manudev.domain.APIResponseStatus
 import com.manudev.domain.model.CharacterDomain
 import com.manudev.domain.usecases.character.GetCharacterByNameUseCase
 import com.manudev.domain.usecases.character.GetCharactersUseCase

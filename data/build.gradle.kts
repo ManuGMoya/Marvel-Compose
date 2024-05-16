@@ -71,4 +71,6 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.retrofitGson)
     implementation(libs.loggingInterceptor)
+
+    implementation ("com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2")
 }

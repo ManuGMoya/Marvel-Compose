@@ -6,6 +6,6 @@ import javax.inject.Inject
 class ComicUseCaseImpl @Inject constructor(
     private val comicRepository: IComicRepository
 ) : ComicUseCase {
-    override suspend fun getComicById(characterId: Int) =
+    override suspend fun execute(characterId: Int) =
         comicRepository.getComicsById(characterId)
 }

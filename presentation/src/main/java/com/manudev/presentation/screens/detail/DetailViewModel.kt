@@ -5,7 +5,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.manudev.domain.APIResponseStatus
 import com.manudev.domain.model.CharacterDomain
 import com.manudev.domain.model.ComicDomain
 import com.manudev.domain.usecases.character.GetCharacterByIdUseCase
@@ -33,16 +32,14 @@ class DetailViewModel @Inject constructor(
     fun getCharacterDetail(id: Int) {
         viewModelScope.launch {
             state = DetailViewState.Loading
-            getCharacterById.execute(id).collect { response ->
-                when (response) {
-                    is APIResponseStatus.Success -> {
-                        state = DetailViewState.Success(response.data, emptyList())
-                        response.data.id?.let { getComics(it) }
-                    }
-
-                    is APIResponseStatus.Error -> {
-                        state = DetailViewState.Error(response.message)
-                    }
+            getCharacterById.execute(id).collect { result ->
+                if (result.isSuccess) {
+                    val response = result.getOrNull()!!
+                    state = DetailViewState.Success(response, emptyList())
+                    response.id?.let { getComics(it) }
+                } else {
+                    state =
+                        DetailViewState.Error(result.exceptionOrNull()?.message ?: "Unknown error")
                 }
             }
         }
@@ -50,22 +47,19 @@ class DetailViewModel @Inject constructor(
 
     private fun getComics(characterId: Int) {
         viewModelScope.launch {
-            comicUseCase.getComicById(characterId).collect { response ->
-                when (response) {
-                    is APIResponseStatus.Success -> {
-                        val character = (state as? DetailViewState.Success)?.character
-                        if (character != null) {
-                            state = DetailViewState.Success(character, response.data)
-                        }
+            comicUseCase.execute(characterId).collect { result ->
+                if (result.isSuccess) {
+                    val response = result.getOrNull()!!
+                    val character = (state as? DetailViewState.Success)?.character
+                    if (character != null) {
+                        state = DetailViewState.Success(character, response)
                     }
-
-                    is APIResponseStatus.Error -> {
-                        state = DetailViewState.Error(response.message)
-                    }
+                } else {
+                    state =
+                        DetailViewState.Error(result.exceptionOrNull()?.message ?: "Unknown error")
                 }
             }
         }
     }
 
 }
-

@@ -1,8 +1,6 @@
 package com.manudev.data.character
 
 import com.manudev.data.character.remote.CharacterApi
-import com.manudev.data.utils.Network.safeCall
-import com.manudev.domain.APIResponseStatus
 import com.manudev.domain.model.CharacterDomain
 import com.manudev.domain.repository.ICharacterRepository
 import kotlinx.coroutines.flow.Flow
@@ -16,50 +14,55 @@ class CharacterRepositoryImpl @Inject constructor(
     override suspend fun getCharacters(
         offset: Int,
         limit: Int
-    ): Flow<APIResponseStatus<List<CharacterDomain>>> =
-        flow {
-            when (val response = service.getAllCharacters(offset, limit).safeCall()) {
-                is APIResponseStatus.Success -> {
-                    val characters = response.data.data?.results!!.map { it.toDomain() }
-                    emit(APIResponseStatus.Success(characters))
-                }
+    ): Flow<Result<List<CharacterDomain>>> = flow {
+        val response = service.getAllCharacters(offset, limit)
+        if (response.isSuccessful) {
+            val characters = response.body()?.data?.results?.map { it.toDomain() }
+            if (characters != null) {
+                emit(Result.success(characters))
+            } else {
+                emit(Result.failure(Exception("No characters found")))
+            }
+        } else {
+            emit(Result.failure(Exception(response.message())))
+        }
+    }
 
-                is APIResponseStatus.Error -> {
-                    emit(APIResponseStatus.Error(response.message))
+
+    override suspend fun getCharacterById(characterId: Int): Flow<Result<CharacterDomain>> =
+        flow {
+            val response = service.getCharacterById(characterId)
+            if (response.isSuccessful) {
+                val character = response.body()?.data?.results?.first()?.toDomain()
+                if (character != null) {
+                    emit(Result.success(character))
+                } else {
+                    emit(Result.failure(Exception("No character found")))
                 }
+            } else {
+                emit(Result.failure(Exception(response.message())))
             }
         }
 
-    override suspend fun getCharacterById(characterId: Int): Flow<APIResponseStatus<CharacterDomain>> =
-        flow {
-            when (val response = service.getCharacterById(characterId).safeCall()) {
-                is APIResponseStatus.Success -> {
-                    val character = response.data.data?.results!!.first().toDomain()
-                    emit(APIResponseStatus.Success(character))
-                }
-
-                is APIResponseStatus.Error -> {
-                    emit(APIResponseStatus.Error(response.message))
-                }
-            }
-        }
 
     override suspend fun getCharacterByName(
         offset: Int,
         limit: Int,
         nameStartsWith: String
-    ): Flow<APIResponseStatus<List<CharacterDomain>>> =
+    ): Flow<Result<List<CharacterDomain>>> =
         flow {
-            when (val response =
-                service.getCharacterByStartName(offset, limit, nameStartsWith).safeCall()) {
-                is APIResponseStatus.Success -> {
-                    val characters = response.data.data?.results!!.map { it.toDomain() }
-                    emit(APIResponseStatus.Success(characters))
-                }
+            val response =
+                service.getCharacterByStartName(offset, limit, nameStartsWith)
 
-                is APIResponseStatus.Error -> {
-                    emit(APIResponseStatus.Error(response.message))
+            if (response.isSuccessful) {
+                val characters = response.body()?.data?.results?.map { it.toDomain() }
+                if (characters != null) {
+                    emit(Result.success(characters))
+                } else {
+                    emit(Result.failure(Exception("No characters found")))
                 }
+            } else {
+                emit(Result.failure(Exception(response.message())))
             }
         }
 }
