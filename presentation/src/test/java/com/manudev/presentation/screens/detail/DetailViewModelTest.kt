@@ -1,5 +1,6 @@
 package com.manudev.presentation.screens.detail
 
+import com.manudev.domain.APIResponseStatus
 import com.manudev.domain.model.CharacterDomain
 import com.manudev.domain.usecases.character.GetCharacterByIdUseCase
 import com.manudev.domain.usecases.comic.ComicUseCase
@@ -44,7 +45,11 @@ class DetailViewModelTest : BaseTestCoroutine() {
                 numberOfComics = 5,
                 description = null
             )
-            coEvery { getCharacterByIdUseCase.execute(any()) } returns flowOf(character)
+            coEvery { getCharacterByIdUseCase.execute(any()) } returns flowOf(
+                APIResponseStatus.Success(
+                    character
+                )
+            )
 
             viewModel.getCharacterDetail(1)
 
@@ -57,7 +62,11 @@ class DetailViewModelTest : BaseTestCoroutine() {
     fun `when getCharacterDetail is called and an error occurs, it should update the state with the error message`() =
         runTest {
             val errorMessage = "Error message"
-            coEvery { getCharacterByIdUseCase.execute(any()) } throws Exception(errorMessage)
+            coEvery { getCharacterByIdUseCase.execute(any()) } returns flowOf(
+                APIResponseStatus.Error(
+                    errorMessage
+                )
+            )
 
             viewModel.getCharacterDetail(1)
 
@@ -77,7 +86,7 @@ class DetailViewModelTest : BaseTestCoroutine() {
                 numberOfComics = 5,
                 description = null
             )
-            val response = flowOf(character)
+            val response = flowOf(APIResponseStatus.Success(character))
 
             coEvery { getCharacterByIdUseCase.execute(any()) } returns response
 
@@ -89,7 +98,7 @@ class DetailViewModelTest : BaseTestCoroutine() {
         }
 
     @Test
-    fun `when getCharacterDetail() is invoked and getComics() throws an error then the error state is updated`() =
+    fun `when getCharacterDetail() is invoked and getComics() returns an error then the error state is updated`() =
         runTest {
             val characterId = 1
             val character = CharacterDomain(
@@ -100,8 +109,16 @@ class DetailViewModelTest : BaseTestCoroutine() {
                 description = null
             )
             val errorMessage = "Error message"
-            coEvery { getCharacterByIdUseCase.execute(any()) } returns flowOf(character)
-            coEvery { comicUseCase.getComicById(any()) } throws Exception(errorMessage)
+            coEvery { getCharacterByIdUseCase.execute(any()) } returns flowOf(
+                APIResponseStatus.Success(
+                    character
+                )
+            )
+            coEvery { comicUseCase.getComicById(any()) } returns flowOf(
+                APIResponseStatus.Error(
+                    errorMessage
+                )
+            )
 
             runBlocking {
                 viewModel.getCharacterDetail(characterId)

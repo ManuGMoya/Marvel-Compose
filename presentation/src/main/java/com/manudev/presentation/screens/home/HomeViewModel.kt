@@ -9,6 +9,7 @@ import com.manudev.domain.APIResponseStatus
 import com.manudev.domain.model.CharacterDomain
 import com.manudev.domain.usecases.character.GetCharacterByNameUseCase
 import com.manudev.domain.usecases.character.GetCharactersUseCase
+import com.manudev.domain.usecases.character.GetCharactersUseCaseImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

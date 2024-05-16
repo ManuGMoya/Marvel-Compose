@@ -1,6 +1,6 @@
 package com.manudev.data.character
 
-import com.manudev.data.character.remote.datasource.CharacterRemoteDataSource
+import com.manudev.data.character.remote.CharacterApi
 import com.manudev.domain.APIResponseStatus
 import com.manudev.domain.model.CharacterDomain
 import com.manudev.domain.repository.ICharacterRepository
@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class CharacterRepositoryImpl @Inject constructor(
-    private val remote: CharacterRemoteDataSource
+    private val service: CharacterApi
 ) : ICharacterRepository {
 
     override suspend fun getCharacters(
@@ -17,31 +17,36 @@ class CharacterRepositoryImpl @Inject constructor(
         limit: Int
     ): Flow<APIResponseStatus<List<CharacterDomain>>> =
         flow {
-            val response = remote.getAllCharacter(offset, limit)
-            if (response is APIResponseStatus.Success) {
-                emit(APIResponseStatus.Success(response.data.data?.results?.map {
-                    it.toDomain()
-                } ?: emptyList()))
-            } else {
-                emit(APIResponseStatus.Error((response as APIResponseStatus.Error).message))
+            try {
+                val response = service.getAllCharacters(offset, limit)
+                if (response.isSuccessful) {
+                    val characters =
+                        response.body()?.data?.results?.map { it.toDomain() } ?: emptyList()
+                    emit(APIResponseStatus.Success(characters))
+                } else {
+                    emit(APIResponseStatus.Error("Error: ${response.code()}"))
+                }
+            } catch (e: Exception) {
+                emit(APIResponseStatus.Error(e.message ?: "Unknown error"))
             }
         }
 
     override suspend fun getCharacterById(characterId: Int): Flow<APIResponseStatus<CharacterDomain>> =
         flow {
-            when (val response = remote.getCharacterById(characterId)) {
-                is APIResponseStatus.Success -> {
-                    val character = response.data.data?.results?.first()?.toDomain()
+            try {
+                val response = service.getCharacterById(characterId)
+                if (response.isSuccessful) {
+                    val character = response.body()?.data?.results?.first()?.toDomain()
                     if (character != null) {
                         emit(APIResponseStatus.Success(character))
                     } else {
                         emit(APIResponseStatus.Error("Character not found"))
                     }
+                } else {
+                    emit(APIResponseStatus.Error("Error: ${response.code()}"))
                 }
-
-                is APIResponseStatus.Error -> {
-                    emit(APIResponseStatus.Error(response.message))
-                }
+            } catch (e: Exception) {
+                emit(APIResponseStatus.Error(e.message ?: "Unknown error"))
             }
         }
 
@@ -51,13 +56,17 @@ class CharacterRepositoryImpl @Inject constructor(
         nameStartsWith: String
     ): Flow<APIResponseStatus<List<CharacterDomain>>> =
         flow {
-            val response = remote.getCharacterByStartName(offset, limit, nameStartsWith)
-            if (response is APIResponseStatus.Success) {
-                emit(APIResponseStatus.Success(response.data.data?.results?.map {
-                    it.toDomain()
-                } ?: emptyList()))
-            } else {
-                emit(APIResponseStatus.Error((response as APIResponseStatus.Error).message))
+            try {
+                val response = service.getCharacterByStartName(offset, limit, nameStartsWith)
+                if (response.isSuccessful) {
+                    val characters =
+                        response.body()?.data?.results?.map { it.toDomain() } ?: emptyList()
+                    emit(APIResponseStatus.Success(characters))
+                } else {
+                    emit(APIResponseStatus.Error("Error: ${response.code()}"))
+                }
+            } catch (e: Exception) {
+                emit(APIResponseStatus.Error(e.message ?: "Unknown error"))
             }
         }
 }
