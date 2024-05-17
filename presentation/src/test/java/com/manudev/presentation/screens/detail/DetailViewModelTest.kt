@@ -8,8 +8,10 @@ import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.impl.annotations.RelaxedMockK
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -34,6 +36,7 @@ class DetailViewModelTest : BaseTestCoroutine() {
         viewModel = DetailViewModel(getCharacterByIdUseCase, comicUseCase)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `when getCharacterDetail is called with a valid ID, it should update the state with the correct character`() =
         runTest {
@@ -45,35 +48,39 @@ class DetailViewModelTest : BaseTestCoroutine() {
                 description = null
             )
             coEvery { getCharacterByIdUseCase.execute(any()) } returns flowOf(
-                APIResponseStatus.Success(
+                Result.success(
                     character
                 )
             )
 
             viewModel.getCharacterDetail(1)
+            advanceUntilIdle()
 
             assertTrue(viewModel.state is DetailViewState.Success)
             val state = viewModel.state as DetailViewState.Success
             assertEquals(character, state.character)
         }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `when getCharacterDetail is called and an error occurs, it should update the state with the error message`() =
         runTest {
             val errorMessage = "Error message"
             coEvery { getCharacterByIdUseCase.execute(any()) } returns flowOf(
-                APIResponseStatus.Error(
-                    errorMessage
+                Result.failure(
+                    RuntimeException(errorMessage)
                 )
             )
 
             viewModel.getCharacterDetail(1)
+            advanceUntilIdle()
 
             assertTrue(viewModel.state is DetailViewState.Error)
             val state = viewModel.state as DetailViewState.Error
             assertEquals(errorMessage, state.error)
         }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `when getCharacterDetail is called and succeeds, it should also call getComics with the correct character ID`() =
         runTest {
@@ -85,17 +92,21 @@ class DetailViewModelTest : BaseTestCoroutine() {
                 numberOfComics = 5,
                 description = null
             )
-            val response = flowOf(APIResponseStatus.Success(character))
-
-            coEvery { getCharacterByIdUseCase.execute(any()) } returns response
+            coEvery { getCharacterByIdUseCase.execute(any()) } returns flowOf(
+                Result.success(
+                    character
+                )
+            )
 
             viewModel.getCharacterDetail(characterId)
+            advanceUntilIdle()
 
             coVerify {
                 comicUseCase.execute(characterId)
             }
         }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `when getCharacterDetail() is invoked and getComics() returns an error then the error state is updated`() =
         runTest {
@@ -109,19 +120,20 @@ class DetailViewModelTest : BaseTestCoroutine() {
             )
             val errorMessage = "Error message"
             coEvery { getCharacterByIdUseCase.execute(any()) } returns flowOf(
-                APIResponseStatus.Success(
+                Result.success(
                     character
                 )
             )
             coEvery { comicUseCase.execute(any()) } returns flowOf(
-                APIResponseStatus.Error(
-                    errorMessage
+                Result.failure(
+                    RuntimeException(errorMessage)
                 )
             )
 
             runBlocking {
                 viewModel.getCharacterDetail(characterId)
             }
+            advanceUntilIdle()
 
             assertTrue(viewModel.state is DetailViewState.Error)
             val state = viewModel.state as DetailViewState.Error
